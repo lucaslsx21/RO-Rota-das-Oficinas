@@ -4,12 +4,18 @@ using RO.DevTest.Persistence.IoC;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using RO.DevTest.Persistence.DatabaseContext;
 
 namespace RO.DevTest.WebApi;
 
 public class Program {
     public static void Main(string[] args) {
         var builder = WebApplication.CreateBuilder(args);
+
+        // Configurar EF Core com conexão de banco de dados
+        builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
         // Configurar autenticação JWT
         builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -33,6 +39,8 @@ public class Program {
 
         builder.Services.InjectPersistenceDependencies()
             .InjectInfrastructureDependencies();
+        builder.Services.AddScoped<IClientRepository, ClientRepository>();
+
 
         // Add Mediatr to program
         builder.Services.AddMediatR(cfg =>
