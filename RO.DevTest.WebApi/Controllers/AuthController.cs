@@ -1,13 +1,26 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using NSwag.Annotations;
+using RO.DevTest.Application.Features.Auth.Commands.LoginCommand;
 
-namespace RO.DevTest.WebApi.Controllers;
+namespace RO.DevTest.WebApi.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AuthController : ControllerBase
+    {
+        private readonly IMediator _mediator;
 
-[Route("api/auth")]
-[OpenApiTags("Auth")]
-public class AuthController(IMediator mediator) : Controller {
-    private readonly IMediator _mediator = mediator;
+        public AuthController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
 
-    ///[TODO] - CREATE LOGIN HANDLER HERE 
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginCommand command)
+        {
+            // Envia o comando de login para o Mediator e obtém a resposta
+            var response = await _mediator.Send(command);
+            return Ok(response);
+        }
+    }
 }
